@@ -15,6 +15,13 @@ export function assertPassword(password: string): void {
   if (password.length < 6) throw new DomainError("Parola en az 6 karakter olmalıdır.");
 }
 
+export function assertPasswordIsPrivate(password: string, publicValues: string[]): void {
+  const normalizedPassword = password.trim();
+  if (publicValues.some((value) => value.trim() === normalizedPassword)) {
+    throw new DomainError("Parola, herkese açık ad veya kurum alanlarında kullanılamaz.");
+  }
+}
+
 export function assertDateISO(value: string): string {
   if (!/^\d{4}-\d{2}-\d{2}$/.test(value)) throw new DomainError("Tarih geçersiz.");
   return value;

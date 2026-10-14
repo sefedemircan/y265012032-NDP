@@ -4,7 +4,7 @@ import { Hospital } from "@/domain/organization/Hospital";
 import { Doctor } from "@/domain/users/Doctor";
 import { HealthPersonnel } from "@/domain/users/HealthPersonnel";
 import type { ClinicManager } from "@/domain/users/ClinicManager";
-import { assertPassword } from "./guards";
+import { assertPassword, assertPasswordIsPrivate } from "./guards";
 import type { AccountGateway, ClinicStore } from "./ports";
 
 export class AccountService {
@@ -21,6 +21,7 @@ export class AccountService {
     kind: "hospital" | "clinic";
   }): Promise<void> {
     assertPassword(input.password);
+    assertPasswordIsPrivate(input.password, [input.fullName, input.facilityName]);
     const facilityId = crypto.randomUUID();
     if (input.kind === "hospital") new Hospital(facilityId, input.facilityName, [], []);
     else new Clinic(facilityId, input.facilityName, facilityId, [], []);
@@ -66,6 +67,7 @@ export class AccountService {
     },
   ): Promise<void> {
     assertPassword(input.password);
+    assertPasswordIsPrivate(input.password, [input.fullName]);
     if (input.serviceIds.length === 0) throw new DomainError("Personelin en az bir hizmeti olmalıdır.");
 
     const snapshot = await this.store.load();
