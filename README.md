@@ -1,36 +1,52 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# KlinikDefter
 
-## Getting Started
+Hastane ve klinik randevu sistemi. Tek bir klinik ya da çok şubeli bir hastane tanımlanabilir. Hasta yalnızca personelin uygun olduğu ve kurumun açık olduğu saatlere randevu talep eder. Çakışan talepler reddedilir. Randevu, atanan personel veya kurum yöneticisi onaylayana kadar beklemede kalır.
 
-First, run the development server:
+## Çalıştırma
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+npm install
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+`.env.example` dosyasını `.env.local` olarak kopyalayıp Supabase proje değerlerini yazın:
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+- `NEXT_PUBLIC_SUPABASE_URL`
+- `NEXT_PUBLIC_SUPABASE_ANON_KEY`
+- `SUPABASE_SERVICE_ROLE_KEY` (yalnızca sunucu; tarayıcıya çıkmaz)
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+Supabase SQL Editor'da `supabase/migrations` altındaki göç dosyasını çalıştırın ya da projeyi bağlayıp `supabase db push` kullanın. Auth ayarında e-posta doğrulamasını kapatın; hasta kaydı oturum açabilsin.
 
-## Learn More
+```bash
+npm run seed
+npm run dev
+```
 
-To learn more about Next.js, take a look at the following resources:
+Uygulama [http://localhost:3000](http://localhost:3000) adresinde açılır.
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## Demo hesapları
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+Parola hepsi için `Klinik123!`.
 
-## Deploy on Vercel
+| E-posta | Rol |
+| --- | --- |
+| hasta@klinikdefter.test | Hasta |
+| doktor@klinikdefter.test | Doktor, Merkez Şube |
+| laborant@klinikdefter.test | Laboratuvar personeli |
+| radyoloji@klinikdefter.test | Radyoloji personeli |
+| doktor.serdivan@klinikdefter.test | Doktor, bağımsız klinik |
+| yonetici@klinikdefter.test | Sakarya Şehir Hastanesi yöneticisi |
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+Seed, çok şubeli bir hastane (Merkez ve Korucuk), bağımsız Serdivan kliniği ve onay bekleyen bir randevu oluşturur.
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## Sınıflar ve ödev maddeleri
+
+İş kuralları `src/domain` içindedir. Supabase satırları repository'de bu sınıflara çevrilir; çakışma ve onay SQL'de tekrarlanmaz.
+
+- `User`, `Patient`, `Staff`, `Doctor`, `HealthPersonnel`, `ClinicManager`: üç rol. Doktor yalnızca muayene, sağlık personeli yalnızca tanı ve laboratuvar hizmeti verir.
+- `HealthcareFacility`, `Hospital`, `Clinic`: hastane şube tutar. Bağımsız klinik ebeveyni olmayan bir kliniktir. Yönetici yalnızca kendi kurumunu tanımlar.
+- `Department`, `WorkingHours`, `MedicalService`: bölüm, çalışma saati, süre ve ücret.
+- `TimeRange`, `AvailabilitySlot`, `SchedulePolicy`, `Appointment`: hasta yalnızca uygunluk ile çalışma saatinin kesişimine randevu alır. Süre ve ücret talep anında kopyalanır. `approve`, `reject` ve `cancel` durumu dışarıdan yazmaz.
+
+```bash
+npm test
+```
