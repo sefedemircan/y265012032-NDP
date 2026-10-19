@@ -34,9 +34,7 @@ export class ClinicService {
     const facilities = snapshot
       .getFacilities()
       .flatMap((facility) => {
-        if (facility.getKind() !== "clinic") return [];
-        const clinic = snapshot.requireClinic(facility.getId());
-        const departments = clinic
+        const departments = facility
           .getDepartments()
           .map((department) => {
             const services = snapshot
@@ -68,12 +66,13 @@ export class ClinicService {
           })
           .filter((department) => department !== null);
         if (departments.length === 0) return [];
-        const parentId = clinic.getParentId();
+        const organizationId = facility.getOrganizationId();
         return [
           {
-            id: clinic.getId(),
-            name: clinic.getName(),
-            organizationName: parentId ? snapshot.facilityName(parentId) : clinic.getName(),
+            id: facility.getId(),
+            name: facility.getName(),
+            organizationName:
+              organizationId === facility.getId() ? facility.getName() : snapshot.facilityName(organizationId),
             departments,
           },
         ];
@@ -143,7 +142,7 @@ export class ClinicService {
   }): Promise<OpenSlot[]> {
     const date = assertDateISO(input.date);
     const snapshot = await this.store.load();
-    const facility = snapshot.requireClinic(input.facilityId);
+    const facility = snapshot.requireFacility(input.facilityId);
     const service = snapshot.requireService(input.serviceId);
     const staff = snapshot.requireStaff(input.staffId);
     if (!staff.provides(service) || staff.getFacilityId() !== facility.getId()) {
@@ -178,7 +177,7 @@ export class ClinicService {
       patient,
       staff,
       service: snapshot.requireService(input.serviceId),
-      facility: snapshot.requireClinic(input.facilityId),
+      facility: snapshot.requireFacility(input.facilityId),
       startsAt,
       availability: snapshot.slotsFor(staff.getId()),
       existing: await this.store.listBlocking(staff.getId(), bounds.from, bounds.to),
