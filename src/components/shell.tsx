@@ -13,7 +13,7 @@ export function Shell({ user, children }: { user: SessionUser; children: React.R
       <AppShell.Header>
         <Group h="100%" px="md" justify="space-between">
           <Anchor component={Link} href={homeForRole(user.role)} underline="never" c="teal.8">
-            <Text fw={700}>KlinikDefter</Text>
+            <Text fw={700}>NDP</Text>
           </Anchor>
           <Group>
             <Text size="sm">{user.fullName}</Text>

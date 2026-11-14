@@ -16,7 +16,9 @@ import { toAppointmentInsert } from "../src/infrastructure/mappers";
 const PASSWORD = "Klinik123!";
 
 function loadEnvFile(): void {
-  const path = resolve(process.cwd(), ".env.local");
+  const path = existsSync(resolve(process.cwd(), ".env.local"))
+    ? resolve(process.cwd(), ".env.local")
+    : resolve(import.meta.dirname, "..", ".env.local");
   if (!existsSync(path)) {
     throw new Error(".env.local bulunamadı.");
   }
@@ -134,12 +136,12 @@ async function main(): Promise<void> {
   loadEnvFile();
   const admin = adminClient();
 
-  const managerId = await ensureUser(admin, "yonetici@klinikdefter.test", "Selin Arslan");
-  const doctorId = await ensureUser(admin, "doktor@klinikdefter.test", "Dr. Emre Demir");
-  const labId = await ensureUser(admin, "laborant@klinikdefter.test", "Merve Aksoy");
-  const radiologyId = await ensureUser(admin, "radyoloji@klinikdefter.test", "Kerem Aydın");
-  const serdivanDoctorId = await ensureUser(admin, "doktor.serdivan@klinikdefter.test", "Dr. Ayşe Kaya");
-  const patientId = await ensureUser(admin, "hasta@klinikdefter.test", "Deniz Yılmaz");
+  const managerId = await ensureUser(admin, "yonetici@ndp.test", "Selin Arslan");
+  const doctorId = await ensureUser(admin, "doktor@ndp.test", "Dr. Emre Demir");
+  const labId = await ensureUser(admin, "laborant@ndp.test", "Merve Aksoy");
+  const radiologyId = await ensureUser(admin, "radyoloji@ndp.test", "Kerem Aydın");
+  const serdivanDoctorId = await ensureUser(admin, "doktor.serdivan@ndp.test", "Dr. Ayşe Kaya");
+  const patientId = await ensureUser(admin, "hasta@ndp.test", "Deniz Yılmaz");
 
   const hospitalId = await ensureFacility(admin, "Sakarya Şehir Hastanesi", "hospital", null);
   const merkezId = await ensureFacility(admin, "Merkez Şube", "clinic", hospitalId);
@@ -147,12 +149,12 @@ async function main(): Promise<void> {
   const serdivanId = await ensureFacility(admin, "Serdivan Aile Sağlığı", "clinic", null);
 
   const profiles = [
-    { id: managerId, full_name: "Selin Arslan", email: "yonetici@klinikdefter.test", role: "clinic_manager", specialty: null, facility_id: hospitalId },
-    { id: doctorId, full_name: "Dr. Emre Demir", email: "doktor@klinikdefter.test", role: "doctor", specialty: "Dahiliye", facility_id: merkezId },
-    { id: labId, full_name: "Merve Aksoy", email: "laborant@klinikdefter.test", role: "health_personnel", specialty: null, facility_id: merkezId },
-    { id: radiologyId, full_name: "Kerem Aydın", email: "radyoloji@klinikdefter.test", role: "health_personnel", specialty: null, facility_id: merkezId },
-    { id: serdivanDoctorId, full_name: "Dr. Ayşe Kaya", email: "doktor.serdivan@klinikdefter.test", role: "doctor", specialty: "Aile Hekimliği", facility_id: serdivanId },
-    { id: patientId, full_name: "Deniz Yılmaz", email: "hasta@klinikdefter.test", role: "patient", specialty: null, facility_id: null },
+    { id: managerId, full_name: "Selin Arslan", email: "yonetici@ndp.test", role: "clinic_manager", specialty: null, facility_id: hospitalId },
+    { id: doctorId, full_name: "Dr. Emre Demir", email: "doktor@ndp.test", role: "doctor", specialty: "Dahiliye", facility_id: merkezId },
+    { id: labId, full_name: "Merve Aksoy", email: "laborant@ndp.test", role: "health_personnel", specialty: null, facility_id: merkezId },
+    { id: radiologyId, full_name: "Kerem Aydın", email: "radyoloji@ndp.test", role: "health_personnel", specialty: null, facility_id: merkezId },
+    { id: serdivanDoctorId, full_name: "Dr. Ayşe Kaya", email: "doktor.serdivan@ndp.test", role: "doctor", specialty: "Aile Hekimliği", facility_id: serdivanId },
+    { id: patientId, full_name: "Deniz Yılmaz", email: "hasta@ndp.test", role: "patient", specialty: null, facility_id: null },
   ];
   for (const profile of profiles) {
     const { error } = await admin.from("profiles").update(profile).eq("id", profile.id);
@@ -231,8 +233,8 @@ async function main(): Promise<void> {
     );
     const appointment = Appointment.request({
       id: crypto.randomUUID(),
-      patient: new Patient(patientId, "Deniz Yılmaz", "hasta@klinikdefter.test"),
-      staff: new Doctor(doctorId, "Dr. Emre Demir", "doktor@klinikdefter.test", "Dahiliye", merkezId, [muayeneId]),
+      patient: new Patient(patientId, "Deniz Yılmaz", "hasta@ndp.test"),
+      staff: new Doctor(doctorId, "Dr. Emre Demir", "doktor@ndp.test", "Dahiliye", merkezId, [muayeneId]),
       service: new MedicalService(muayeneId, "Genel Muayene", "examination", 20, 50_000, merkezDahiliye, merkezId),
       facility: new Clinic(merkezId, "Merkez Şube", hospitalId, weekdayHours, [
         new Department(merkezDahiliye, "Dahiliye", merkezId),

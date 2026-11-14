@@ -1,4 +1,4 @@
-# KlinikDefter
+# NDP
 
 Hastane ve klinik randevu sistemi. Tek bir klinik ya da çok şubeli bir hastane tanımlanabilir. Hasta yalnızca personelin uygun olduğu ve kurumun açık olduğu saatlere randevu talep eder. Çakışan talepler reddedilir. Randevu, atanan personel veya kurum yöneticisi onaylayana kadar beklemede kalır.
 
@@ -29,12 +29,12 @@ Parola hepsi için `Klinik123!`.
 
 | E-posta | Rol |
 | --- | --- |
-| hasta@klinikdefter.test | Hasta |
-| doktor@klinikdefter.test | Doktor, Merkez Şube |
-| laborant@klinikdefter.test | Laboratuvar personeli |
-| radyoloji@klinikdefter.test | Radyoloji personeli |
-| doktor.serdivan@klinikdefter.test | Doktor, bağımsız klinik |
-| yonetici@klinikdefter.test | Sakarya Şehir Hastanesi yöneticisi |
+| hasta@ndp.test | Hasta |
+| doktor@ndp.test | Doktor, Merkez Şube |
+| laborant@ndp.test | Laboratuvar personeli |
+| radyoloji@ndp.test | Radyoloji personeli |
+| doktor.serdivan@ndp.test | Doktor, bağımsız klinik |
+| yonetici@ndp.test | Sakarya Şehir Hastanesi yöneticisi |
 
 Seed, çok şubeli bir hastane (Merkez ve Korucuk), bağımsız Serdivan kliniği ve onay bekleyen bir randevu oluşturur.
 

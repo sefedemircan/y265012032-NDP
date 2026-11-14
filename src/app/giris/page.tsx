@@ -7,7 +7,7 @@ export default function LoginPage() {
     <AuthPageShell
       eyebrow="TEKRAR HOŞ GELDİNİZ"
       title="Hesabınıza giriş yapın"
-      description="Randevularınıza ve çalışma alanınıza güvenli şekilde devam edin."
+      description="Demo hesabı seçip şifresiz giriş yapın."
       footer={
         <>
           Hesabınız yok mu? <Anchor href="/kayit">Hasta kaydı</Anchor>

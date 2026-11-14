@@ -3,6 +3,7 @@ import { Clinic } from "@/domain/organization/Clinic";
 import { Hospital } from "@/domain/organization/Hospital";
 import { Doctor } from "@/domain/users/Doctor";
 import { HealthPersonnel } from "@/domain/users/HealthPersonnel";
+import { Patient } from "@/domain/users/Patient";
 import type { ClinicManager } from "@/domain/users/ClinicManager";
 import { assertPassword, assertPasswordIsPrivate } from "./guards";
 import type { AccountGateway, ClinicStore } from "./ports";
@@ -12,6 +13,38 @@ export class AccountService {
     private readonly store: ClinicStore,
     private readonly accounts: AccountGateway,
   ) {}
+
+  async registerPatient(input: {
+    fullName: string;
+    email: string;
+    password: string;
+  }): Promise<void> {
+    assertPassword(input.password);
+    assertPasswordIsPrivate(input.password, [input.fullName]);
+    const fullName = input.fullName.trim();
+    const email = input.email.trim();
+    new Patient("taslak", fullName, email);
+
+    const userId = await this.accounts.createConfirmedUser({
+      email,
+      password: input.password,
+      fullName,
+    });
+
+    try {
+      await this.accounts.assignProfile({
+        id: userId,
+        fullName,
+        email,
+        role: "patient",
+        specialty: null,
+        facilityId: null,
+      });
+    } catch (error) {
+      await this.accounts.deleteUser(userId).catch(() => undefined);
+      throw error;
+    }
+  }
 
   async registerManager(input: {
     fullName: string;

@@ -19,9 +19,9 @@ export function AuthPageShell({ eyebrow, title, description, children, footer }:
         <Link href="/" className="backLink">
           <span aria-hidden="true">←</span> Ana sayfaya dön
         </Link>
-        <Link href="/" className="brandLink authBrand" aria-label="KlinikDefter ana sayfa">
+        <Link href="/" className="brandLink authBrand" aria-label="NDP ana sayfa">
           <span className="brandMark">+</span>
-          <span>KlinikDefter</span>
+          <span>NDP</span>
         </Link>
         <Paper className="authCard" radius="xl">
           <Stack gap="xl">

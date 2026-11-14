@@ -13,7 +13,7 @@ const manrope = Manrope({
 });
 
 export const metadata: Metadata = {
-  title: "KlinikDefter",
+  title: "NDP",
   description: "Hastane ve klinik randevu sistemi",
 };
 

@@ -73,6 +73,7 @@ export function PatientPanel({ data }: { data: PatientDashboard }) {
               setServiceId(null);
               setStaffId(null);
               setSlots([]);
+              setStartMinute(null);
             }}
           />
           <Select
@@ -84,6 +85,7 @@ export function PatientPanel({ data }: { data: PatientDashboard }) {
               setServiceId(null);
               setStaffId(null);
               setSlots([]);
+              setStartMinute(null);
             }}
             disabled={!facility}
           />
@@ -98,6 +100,7 @@ export function PatientPanel({ data }: { data: PatientDashboard }) {
               setServiceId(value);
               setStaffId(null);
               setSlots([]);
+              setStartMinute(null);
             }}
             disabled={!department}
           />
@@ -111,6 +114,7 @@ export function PatientPanel({ data }: { data: PatientDashboard }) {
             onChange={(value) => {
               setStaffId(value);
               setSlots([]);
+              setStartMinute(null);
             }}
             disabled={!service}
           />
@@ -120,6 +124,7 @@ export function PatientPanel({ data }: { data: PatientDashboard }) {
             onChange={(value) => {
               setDate(dateValue(value));
               setSlots([]);
+              setStartMinute(null);
             }}
             minDate={dayjs().format("YYYY-MM-DD")}
             maxDate={dayjs().add(30, "day").format("YYYY-MM-DD")}

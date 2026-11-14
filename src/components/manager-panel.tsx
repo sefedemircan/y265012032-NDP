@@ -33,8 +33,9 @@ import { AppointmentList } from "./appointment-list";
 import { toast } from "./toast";
 
 export function ManagerPanel({ data }: { data: ManagerDashboard }) {
-  const [facilityId, setFacilityId] = useState<string | null>(data.facilities[0]?.id ?? null);
-  const facility = data.facilities.find((item) => item.id === facilityId) ?? data.facilities[0];
+  const defaultFacility = data.facilities.find((item) => item.kind === "clinic") ?? data.facilities[0];
+  const [facilityId, setFacilityId] = useState<string | null>(defaultFacility?.id ?? null);
+  const facility = data.facilities.find((item) => item.id === facilityId) ?? defaultFacility;
   const options = data.facilities.map((item) => ({
     value: item.id,
     label: `${item.name} (${item.kind === "hospital" ? "hastane" : "klinik"})`,
@@ -73,16 +74,16 @@ export function ManagerPanel({ data }: { data: ManagerDashboard }) {
           {facility ? <HoursForm key={facility.id} facility={facility} /> : null}
         </Tabs.Panel>
         <Tabs.Panel value="bolum" pt="md">
-          {facility ? <DepartmentForm facility={facility} /> : null}
+          {facility ? <DepartmentForm key={facility.id} facility={facility} /> : null}
         </Tabs.Panel>
         <Tabs.Panel value="hizmet" pt="md">
-          {facility ? <ServiceForm facility={facility} /> : null}
+          {facility ? <ServiceForm key={facility.id} facility={facility} /> : null}
         </Tabs.Panel>
         <Tabs.Panel value="personel" pt="md">
-          {facility ? <StaffForm facility={facility} /> : null}
+          {facility ? <StaffForm key={facility.id} facility={facility} /> : null}
         </Tabs.Panel>
         <Tabs.Panel value="uygunluk" pt="md">
-          {facility ? <SlotForm facility={facility} /> : null}
+          {facility ? <SlotForm key={facility.id} facility={facility} /> : null}
         </Tabs.Panel>
         <Tabs.Panel value="onay" pt="md">
           <Paper withBorder p="lg" radius="md" bg="white">
@@ -248,6 +249,9 @@ function ServiceForm({ facility }: { facility: ManagedFacility }) {
   const [duration, setDuration] = useState<number | string>(20);
   const [fee, setFee] = useState("500");
   const [loading, setLoading] = useState(false);
+  const activeDepartmentId = facility.departments.some((item) => item.id === departmentId)
+    ? departmentId
+    : (facility.departments[0]?.id ?? null);
 
   return (
     <Paper withBorder p="lg" radius="md" bg="white">
@@ -263,7 +267,7 @@ function ServiceForm({ facility }: { facility: ManagedFacility }) {
         <Select
           label="Bölüm"
           data={facility.departments.map((department) => ({ value: department.id, label: department.name }))}
-          value={departmentId}
+          value={activeDepartmentId}
           onChange={setDepartmentId}
         />
         <TextInput label="Hizmet adı" value={name} onChange={(event) => setName(event.currentTarget.value)} />
@@ -283,11 +287,14 @@ function ServiceForm({ facility }: { facility: ManagedFacility }) {
           w="fit-content"
           loading={loading}
           onClick={async () => {
-            if (!departmentId) return;
+            if (!activeDepartmentId) {
+              toast({ error: "Önce bir bölüm ekleyin veya seçin." });
+              return;
+            }
             setLoading(true);
             const result = await addService({
               facilityId: facility.id,
-              departmentId,
+              departmentId: activeDepartmentId,
               name,
               category,
               durationMinutes: Number(duration),
@@ -364,7 +371,6 @@ function StaffForm({ facility }: { facility: ManagedFacility }) {
           label="Parola"
           name="staffNewPassword"
           autoComplete="new-password"
-          visible={false}
           value={password}
           onChange={(event) => setPassword(event.currentTarget.value)}
         />
@@ -412,7 +418,10 @@ function SlotForm({ facility }: { facility: ManagedFacility }) {
   const [start, setStart] = useState("09:00");
   const [end, setEnd] = useState("12:00");
   const [loading, setLoading] = useState(false);
-  const member = facility.staff.find((item) => item.id === staffId);
+  const activeStaffId = facility.staff.some((item) => item.id === staffId)
+    ? staffId
+    : (facility.staff[0]?.id ?? null);
+  const member = facility.staff.find((item) => item.id === activeStaffId);
 
   return (
     <Paper withBorder p="lg" radius="md" bg="white">
@@ -421,7 +430,7 @@ function SlotForm({ facility }: { facility: ManagedFacility }) {
         <Select
           label="Personel"
           data={facility.staff.map((item) => ({ value: item.id, label: item.fullName }))}
-          value={staffId}
+          value={activeStaffId}
           onChange={setStaffId}
         />
         {member?.slots.map((slot) => (
@@ -454,12 +463,12 @@ function SlotForm({ facility }: { facility: ManagedFacility }) {
         <Button
           w="fit-content"
           loading={loading}
-          disabled={!staffId}
+          disabled={!activeStaffId}
           onClick={async () => {
-            if (!staffId) return;
+            if (!activeStaffId) return;
             setLoading(true);
             const result = await saveAvailability({
-              staffId,
+              staffId: activeStaffId,
               dayOfWeek: Number(dayOfWeek),
               start,
               end,
